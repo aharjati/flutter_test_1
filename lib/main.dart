@@ -101,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
       posts.clear();
     });
 
-    final response = await http.get('https://jsonplaceholder.typicode.com/photos2');
+    final response = await http.get('https://jsonplaceholder.typicode.com/photos');
 
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
