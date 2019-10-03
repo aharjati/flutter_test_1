@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'AL AL AL AL'),
     );
   }
 }
@@ -158,14 +158,60 @@ class _MyHomePageState extends State<MyHomePage> {
     return ListTile(
     contentPadding: EdgeInsets.all(10.0),
     title: new Text("title: ${posts.elementAt(index).title}"),
-      trailing: new Image.network(
-        posts.elementAt(index).thumbnailUrl,
-        fit: BoxFit.cover,
-        height: 40.0,
-        width: 40.0,
+      trailing: new RaisedButton(
+        child: Text('Open'),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SecondPage(),
+          settings: RouteSettings(
+          arguments: ScreenArguments('Extract Arguments Screen',posts.elementAt(index).title)
+          ),
+            )
+          );
+        },
       ),
     );
     })
     );
   }
+}
+class SecondPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final ScreenArguments args = ModalRoute.of(context).settings.arguments;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(args.title),
+      ),
+      body: Column(children: <Widget>[
+        Row(
+          children: <Widget>[
+            Text(args.message)
+          ],
+        ),
+        Row(
+          children: <Widget>[
+        Center(
+    child: RaisedButton(
+    onPressed: () {
+    Navigator.pop(context);
+    },
+    child: Text('Go back!'),
+    ))
+          ],
+        )
+        ]
+      )
+
+    );
+  }
+}
+
+class ScreenArguments {
+  final String title;
+  final String message;
+
+  ScreenArguments(this.title, this.message);
 }
