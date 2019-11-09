@@ -5,11 +5,29 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class Post {
-  final String title;
-  final String thumbnailUrl;
-  Post({this.title, this.thumbnailUrl});
+  final String name;
+  final String location;
+  final String createDate;
+  Post({this.name, this.location, this.createDate});
   factory Post.fromJson(Map<String, dynamic> json) {
     return new Post(
+      name: json['name'],
+      location: json['location'],
+      createDate: json['create_date'],
+    );
+  }
+  @override
+  String toString() {
+    return name;
+  }
+}
+
+class Post1 {
+  final String title;
+  final String thumbnailUrl;
+  Post1({this.title, this.thumbnailUrl});
+  factory Post1.fromJson(Map<String, dynamic> json) {
+    return new Post1(
       title: json['title'],
       thumbnailUrl: json['thumbnailUrl'],
     );
@@ -59,7 +77,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'AL AL AL AL'),
+      home: MyHomePage(title: 'TEST'),
     );
   }
 }
@@ -87,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void runMyFuture() {
     fetchPosts().then((value) {
       setState(() {
-        tmp = "FETCHED : ${value}";
+        tmp = "FETCHED : $value";
         isLoading = false;
       });
     }, onError: (error) {
@@ -101,25 +119,21 @@ class _MyHomePageState extends State<MyHomePage> {
       posts.clear();
     });
 
-    final response = await http.get('https://jsonplaceholder.typicode.com/photos');
+    final response = await http.get('http://192.168.1.86:8081/api/ride');
 
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
-      List jsonList = json.decode(response.body) as List;
-      setState(() {
-        isLoading = false;
-      });
-      jsonList.map( (jl) => print("jsonElement: ${jl.toString()}"));
-      posts = jsonList.map(
-              (jsonElement) => Post.fromJson(jsonElement)
-      ).toList();
+      Map data = json.decode(response.body);
+      var tmp1 = data["data"];
+      posts = tmp1.map((result) =>  Post.fromJson(result) ).toList();
+
       return true;
     } else {
       // If that call was not successful, throw an error.
       return false;
     }
   }
-  String tmp = "No";
+  String tmp = "Query";
   bool isLoading = false;
   List posts = List();
   /*@override
@@ -157,7 +171,7 @@ class _MyHomePageState extends State<MyHomePage> {
     itemBuilder: (BuildContext context, int index) {
     return ListTile(
     contentPadding: EdgeInsets.all(10.0),
-    title: new Text("title: ${posts.elementAt(index).title}"),
+    title: new Text("title: ${posts.elementAt(index).name}"),
       trailing: new RaisedButton(
         child: Text('Open'),
         onPressed: () {
