@@ -179,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
             context,
             MaterialPageRoute(builder: (context) => SecondPage(),
           settings: RouteSettings(
-          arguments: ScreenArguments('Extract Arguments Screen',posts.elementAt(index).title)
+          arguments: ScreenArguments('Extract Arguments Screen',posts.elementAt(index).name)
           ),
             )
           );
