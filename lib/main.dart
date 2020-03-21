@@ -179,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
             context,
             MaterialPageRoute(builder: (context) => SecondPage(),
           settings: RouteSettings(
-          arguments: ScreenArguments('Extract Arguments Screen',posts.elementAt(index).name)
+          arguments: ScreenArguments('Extract Arguments Screen',Ride(posts.elementAt(index).name,posts.elementAt(index).location))
           ),
             )
           );
@@ -202,21 +202,22 @@ class SecondPage extends StatelessWidget {
       body: Column(children: <Widget>[
         Row(
           children: <Widget>[
-            Text(args.message)
+            Text(args.ride.name+" is located at "+args.ride.location)
           ],
         ),
         Row(
           children: <Widget>[
-        Center(
-    child: RaisedButton(
-    onPressed: () {
-    Navigator.pop(context);
-    },
-    child: Text('Go back!'),
-    ))
+            Center(
+              child: RaisedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              child: Text('Go back!'),
+              )
+            )
           ],
         )
-        ]
+      ]
       )
 
     );
@@ -225,7 +226,14 @@ class SecondPage extends StatelessWidget {
 
 class ScreenArguments {
   final String title;
-  final String message;
+  final Ride ride;
 
-  ScreenArguments(this.title, this.message);
+  ScreenArguments(this.title, this.ride);
+}
+
+class Ride {
+  final String name;
+  final String location;
+
+  Ride(this.name, this.location);
 }
