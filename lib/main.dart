@@ -202,9 +202,30 @@ class SecondPage extends StatelessWidget {
       body: Column(children: <Widget>[
         Row(
           children: <Widget>[
-            Text(args.ride.name+" is located at "+args.ride.location)
+            Text(args.ride.name+" is at "),
+            SizedBox(
+              width: 100.0,
+              height: 50.0,
+              child: TextField(
+                obscureText: true,
+                maxLength: 10,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: args.ride.location,
+                ),
+              )
+            ),
+            RaisedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Update'),
+            )
+
           ],
+
         ),
+
         Row(
           children: <Widget>[
             Center(
