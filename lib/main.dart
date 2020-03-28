@@ -4,13 +4,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+
 class Post {
+  final String id;
   final String name;
   final String location;
   final String createDate;
-  Post({this.name, this.location, this.createDate});
+  Post({this.id, this.name, this.location, this.createDate});
   factory Post.fromJson(Map<String, dynamic> json) {
     return new Post(
+      id: json["_id"],
       name: json['name'],
       location: json['location'],
       createDate: json['create_date'],
@@ -101,6 +104,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  String tmp = "Query";
+  bool isLoading = false;
+  List posts = List();
+
 
   void runMyFuture() {
     fetchPosts().then((value) {
@@ -133,9 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
       return false;
     }
   }
-  String tmp = "Query";
-  bool isLoading = false;
-  List posts = List();
+
   /*@override
   void initState() {
     super.initState();
@@ -179,7 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
             context,
             MaterialPageRoute(builder: (context) => SecondPage(),
           settings: RouteSettings(
-          arguments: ScreenArguments('Extract Arguments Screen',Ride(posts.elementAt(index).name,posts.elementAt(index).location))
+          arguments: ScreenArguments('Extract Arguments Screen',Ride(posts.elementAt(index).id,posts.elementAt(index).name,posts.elementAt(index).location))
           ),
             )
           );
@@ -190,7 +195,61 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-class SecondPage extends StatelessWidget {
+class SecondPage extends StatefulWidget {
+  SecondPage({Key key, this.title}) : super(key: key);
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+  @override
+  _SecondPage createState() => _SecondPage();
+}
+
+class _SecondPage extends State<SecondPage> {
+  @override
+
+  final myController = TextEditingController();
+  String tmp = "SET";
+  bool isPosting = false;
+  void runMyPost(String url, Map<String,String> body) {
+    sendPost(url,body).then((value) {
+      setState(() {
+        tmp = "DONE: $value";
+        isPosting = false;
+      });
+    }, onError: (error) {
+      print(error);
+    });
+  }
+
+  Future<int> sendPost(String url,  Map<String,String> bodyMap) async {
+    setState(() {
+      isPosting = true;
+      tmp = "...";
+    });
+    // set up POST request arguments
+   Map<String, String> headers = {"Content-type": "application/x-www-form-urlencoded"};
+    //String json = '{"title": "Hello", "body": "body text", "userId": 1}';
+    // make POST request
+
+    print("Sending: $bodyMap");
+    final response = await http.put(url, headers: headers, body: bodyMap);
+    // check the status code for the result
+    int statusCode = response.statusCode;
+    // this API passes back the id of the new item added to the body
+    String body = response.body;
+
+    print("Response status code: $statusCode  , body: $body");
+
+    return statusCode;
+  }
   @override
   Widget build(BuildContext context) {
     final ScreenArguments args = ModalRoute.of(context).settings.arguments;
@@ -202,11 +261,13 @@ class SecondPage extends StatelessWidget {
       body: Column(children: <Widget>[
         Row(
           children: <Widget>[
-            Text(args.ride.name+" is at "),
+            Text(myController.text+" "),
+            Text(args.ride.id+" is at "),
             SizedBox(
               width: 100.0,
               height: 50.0,
               child: TextField(
+                controller: myController,
                 obscureText: true,
                 maxLength: 10,
                 decoration: InputDecoration(
@@ -217,7 +278,8 @@ class SecondPage extends StatelessWidget {
             ),
             RaisedButton(
               onPressed: () {
-                Navigator.pop(context);
+
+                sendPost('http://192.168.1.86:8081/api/rides/${args.ride.id}', {"location":  myController.text} );
               },
               child: Text('Update'),
             )
@@ -253,8 +315,9 @@ class ScreenArguments {
 }
 
 class Ride {
+  final String id;
   final String name;
   final String location;
 
-  Ride(this.name, this.location);
+  Ride(this.id,this.name, this.location);
 }
